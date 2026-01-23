@@ -29,6 +29,7 @@ package core
 import "C"
 import (
 	"fmt"
+	"strings"
 
 	"github.com/cx-luo/go-indigo/render"
 )
@@ -52,10 +53,22 @@ func defaultRenderOptions() *render.RenderOptions {
 
 // InitRenderer initializes the Indigo renderer with default options for the current session
 // This should be called before using rendering functions
+// If initialization fails due to options already being defined, it's treated as success
+// since the renderer is already initialized
 func (in *Indigo) InitRenderer() (*render.Renderer, error) {
+	// Set session first
+	in.setSession()
+
 	ret := int(C.indigoRendererInit(C.ulonglong(in.sid)))
 	if ret < 0 {
-		return nil, fmt.Errorf("failed to initialize renderer: %s", lastErrorString())
+		errMsg := lastErrorString()
+		// If initialization fails due to option already defined, treat as success
+		// since the renderer is already initialized
+		if errMsg != "" && strings.Contains(errMsg, "already defined") {
+			// Renderer is already initialized, return success
+			return &render.Renderer{Sid: in.sid, Options: defaultRenderOptions(), RendererInitialized: true}, nil
+		}
+		return nil, fmt.Errorf("failed to initialize renderer: %s", errMsg)
 	}
 
 	return &render.Renderer{Sid: in.sid, Options: defaultRenderOptions(), RendererInitialized: true}, nil

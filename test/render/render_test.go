@@ -481,7 +481,7 @@ func TestRenderInvalidHandle(t *testing.T) {
 	}
 	defer indigoRender.DisposeRenderer()
 	err = indigoRender.RenderToFile(-1, outputFile)
-	if err != nil {
+	if err == nil {
 		t.Error("expected error when rendering with invalid handle")
 	}
 }

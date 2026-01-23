@@ -173,6 +173,15 @@ func (r *Reaction) GetMolecule(index int) (int, error) {
 		return 0, fmt.Errorf("reaction is closed")
 	}
 
+	// Check bounds before calling C function
+	count, err := r.CountMolecules()
+	if err != nil {
+		return 0, fmt.Errorf("failed to count molecules: %s", err)
+	}
+	if index < 0 || index >= count {
+		return 0, fmt.Errorf("molecule index %d out of bounds (count: %d)", index, count)
+	}
+
 	handle := int(C.indigoGetMolecule(C.int(r.Handle), C.int(index)))
 	if handle < 0 {
 		return 0, fmt.Errorf("failed to get molecule at index %d: %s", index, getLastError())

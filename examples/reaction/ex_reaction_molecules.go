@@ -28,9 +28,6 @@ func main() {
 		panic(err)
 	}
 
-	if err != nil {
-		log.Fatalf("Failed to initialize Indigo: %v", err)
-	}
 	defer indigoInchi.InchiDispose()
 
 	// Load a reaction: Fischer esterification

@@ -157,8 +157,8 @@ func TestNumRotatableBonds(t *testing.T) {
 		smiles   string
 		expected int
 	}{
-		{"Ethanol", "CCO", 1},
-		{"Propanol", "CCCO", 2},
+		{"Ethanol", "CCO", 0},   // Indigo doesn't count bonds to terminal groups (OH) as rotatable
+		{"Propanol", "CCCO", 1}, // Indigo counts only internal rotatable bonds
 		{"Benzene", "c1ccccc1", 0},
 	}
 
@@ -169,6 +169,11 @@ func TestNumRotatableBonds(t *testing.T) {
 				t.Fatalf("failed to load molecule: %v", err)
 			}
 			defer m.Close()
+
+			// Normalize the molecule to ensure consistent rotatable bond counting
+			if err := m.Normalize(""); err != nil {
+				t.Errorf("failed to normalize molecule: %v", err)
+			}
 
 			count, err := m.NumRotatableBonds()
 			if err != nil {
