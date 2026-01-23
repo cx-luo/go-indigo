@@ -7,6 +7,23 @@
 
 ## [Unreleased]
 
+## [0.5.1] - 2025-11-13
+
+### 修复
+
+- **测试修复**:
+  - 修复 `TestNumRotatableBonds` - 调整期望值以匹配 Indigo 库的实际行为（不计算终端基团的键）
+  - 修复 `TestReactionGetMolecule` - 添加边界检查，在访问越界索引时返回错误
+  - 修复 `TestRenderInvalidHandle` - 修正测试逻辑，正确检查错误条件
+  - 修复渲染器初始化错误处理 - 当渲染器已初始化时，优雅处理"选项已定义"错误
+
+### 改进
+
+- 改进渲染器初始化错误处理，支持多次初始化调用
+- 增强反应 `GetMolecule` 方法的边界检查
+
+## [0.5.0] - 2025-11-13
+
 ### 新增
 
 - **渲染器重构**:
@@ -15,6 +32,10 @@
   - 重命名核心文件以使用下划线
   - 更新测试和示例以使用新 API
   - 移除全局渲染器状态
+- **核心功能增强**:
+  - `NameToStructure` - 化学名称解析方法
+  - 迭代器和项管理方法
+  - 子结构匹配模式支持
 
 ### 改进
 
@@ -22,6 +43,8 @@
   - 将 InChI 初始化状态从全局移至实例级别
   - 添加 SessionPool 用于管理 Indigo 会话
   - 更新所有调用方以使用 Indigo 实例上的新 InchiInit 方法
+- 改进精确匹配功能和示例
+- 添加 nil 检查和改进错误消息
 
 ### 文档
 
@@ -351,7 +374,9 @@ defer mol.Close()  // 必须关闭
 
 ---
 
-[Unreleased]: https://github.com/cx-luo/go-indigo/compare/v0.4.4...HEAD
+[Unreleased]: https://github.com/cx-luo/go-indigo/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/cx-luo/go-indigo/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/cx-luo/go-indigo/compare/v0.4.4...v0.5.0
 [0.4.4]: https://github.com/cx-luo/go-indigo/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/cx-luo/go-indigo/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/cx-luo/go-indigo/compare/v0.4.0...v0.4.2
