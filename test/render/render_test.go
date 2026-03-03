@@ -528,3 +528,34 @@ func TestRenderMultipleFormats(t *testing.T) {
 		})
 	}
 }
+
+func TestRenderToFile(t *testing.T) {
+	// Load a molecule
+	mol, err := indigoInit.LoadMoleculeFromFile("../test_data/markush.mol")
+	if err != nil {
+		t.Fatalf("failed to load molecule: %v", err)
+	}
+	defer mol.Close()
+
+	outputFile := filepath.Join("../test_data/", "markush.svg")
+
+	indigoRender, err := indigoInit.InitRenderer()
+	if err != nil {
+		panic(err)
+	}
+	// Set format to SVG
+	indigoRender.SetRenderOption("render-output-format", "svg")
+	// Render to file
+	if err := indigoRender.RenderToFile(mol.Handle, outputFile); err != nil {
+		t.Fatalf("failed to render to file: %v", err)
+	}
+
+	// Verify file exists and has content
+	info, err := os.Stat(outputFile)
+	if err != nil {
+		t.Fatalf("output file was not created: %v", err)
+	}
+	if info.Size() == 0 {
+		t.Error("output SVG file is empty")
+	}
+}
