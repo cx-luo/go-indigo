@@ -31,7 +31,7 @@ func NewIndigoService(poolSize int) *IndigoService {
 	}
 }
 
-// loadStructure loads a molecule or reaction from the request body using the given Indigo session.
+// loadMolecule loads a molecule from the request body using the given Indigo session.
 // It attempts auto-detection when input_format is empty or "auto".
 func (s *IndigoService) loadMolecule(indigo *core.Indigo, req *StructRequest) (*moleculeHandle, error) {
 	mol, err := indigo.LoadMoleculeFromString(req.Struct)
@@ -74,18 +74,34 @@ type moleculeHandle struct {
 	}
 }
 
-// handleInfo returns library version info
-// GET /v2/indigo/info
+// handleInfo godoc
+//
+//	@Summary		Get library version info
+//	@Description	Returns the version of the Indigo C library and the go-indigo service
+//	@Tags			indigo
+//	@Produce		json
+//	@Success		200	{object}	InfoResponse
+//	@Router			/v2/indigo/info [get]
 func (s *IndigoService) handleInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, InfoResponse{
-		IndigoVersion:  "1.x", // Indigo C library version
+		IndigoVersion:  "1.x",
 		ServiceName:    "go-indigo-service",
 		ServiceVersion: serviceVersion,
 	})
 }
 
-// handleAromatize aromatizes the input structure
-// POST /v2/indigo/aromatize
+// handleAromatize godoc
+//
+//	@Summary		Aromatize structure
+//	@Description	Aromatize the input chemical structure (molecule or reaction)
+//	@Tags			indigo
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		StructRequest	true	"Structure to aromatize"
+//	@Success		200		{object}	StructResponse
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/v2/indigo/aromatize [post]
 func (s *IndigoService) handleAromatize(c *gin.Context) {
 	var req StructRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -125,8 +141,18 @@ func (s *IndigoService) handleAromatize(c *gin.Context) {
 	})
 }
 
-// handleDearomatize dearomatizes the input structure
-// POST /v2/indigo/dearomatize
+// handleDearomatize godoc
+//
+//	@Summary		Dearomatize structure
+//	@Description	Remove aromaticity from the input chemical structure
+//	@Tags			indigo
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		StructRequest	true	"Structure to dearomatize"
+//	@Success		200		{object}	StructResponse
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/v2/indigo/dearomatize [post]
 func (s *IndigoService) handleDearomatize(c *gin.Context) {
 	var req StructRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -166,8 +192,18 @@ func (s *IndigoService) handleDearomatize(c *gin.Context) {
 	})
 }
 
-// handleCalculate calculates molecular properties
-// POST /v2/indigo/calculate
+// handleCalculate godoc
+//
+//	@Summary		Calculate molecular properties
+//	@Description	Calculate properties (molecular weight, formula, TPSA, etc.) for the input structure. If properties array is empty, all properties are computed.
+//	@Tags			indigo
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		CalculateRequest	true	"Structure and optional property list"
+//	@Success		200		{object}	CalculateResponse
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/v2/indigo/calculate [post]
 func (s *IndigoService) handleCalculate(c *gin.Context) {
 	var req CalculateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -183,7 +219,11 @@ func (s *IndigoService) handleCalculate(c *gin.Context) {
 	indigo := s.Pool.Get()
 	defer s.Pool.Put(indigo)
 
-	mh, err := s.loadMolecule(indigo, &req.StructRequest)
+	mh, err := s.loadMolecule(indigo, &StructRequest{
+		Struct:      req.Struct,
+		InputFormat: req.InputFormat,
+		Options:     req.Options,
+	})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "failed to load structure", Details: err.Error()})
 		return
@@ -270,8 +310,18 @@ func (s *IndigoService) handleCalculate(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// handleConvert converts a structure to a different format
-// POST /v2/indigo/convert
+// handleConvert godoc
+//
+//	@Summary		Convert structure format
+//	@Description	Convert a chemical structure to a different format (SMILES, Molfile, CML, CDXML, JSON/KET)
+//	@Tags			indigo
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		ConvertRequest	true	"Structure and target output format"
+//	@Success		200		{object}	StructResponse
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/v2/indigo/convert [post]
 func (s *IndigoService) handleConvert(c *gin.Context) {
 	var req ConvertRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -292,7 +342,11 @@ func (s *IndigoService) handleConvert(c *gin.Context) {
 	indigo := s.Pool.Get()
 	defer s.Pool.Put(indigo)
 
-	mh, err := s.loadMolecule(indigo, &req.StructRequest)
+	mh, err := s.loadMolecule(indigo, &StructRequest{
+		Struct:      req.Struct,
+		InputFormat: req.InputFormat,
+		Options:     req.Options,
+	})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "failed to load structure", Details: err.Error()})
 		return
@@ -311,8 +365,18 @@ func (s *IndigoService) handleConvert(c *gin.Context) {
 	})
 }
 
-// handleClean performs 2D coordinate cleanup
-// POST /v2/indigo/clean
+// handleClean godoc
+//
+//	@Summary		Clean up structure coordinates
+//	@Description	Perform 2D layout and coordinate cleanup for the input structure. Returns the result in Molfile format.
+//	@Tags			indigo
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		StructRequest	true	"Structure to clean"
+//	@Success		200		{object}	StructResponse
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/v2/indigo/clean [post]
 func (s *IndigoService) handleClean(c *gin.Context) {
 	var req StructRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -357,8 +421,18 @@ func (s *IndigoService) handleClean(c *gin.Context) {
 	})
 }
 
-// handleRender renders a structure to an image
-// POST /v2/indigo/render
+// handleRender godoc
+//
+//	@Summary		Render structure to image
+//	@Description	Render a chemical structure to PNG, SVG, or PDF. For PNG/PDF the response image field is base64-encoded; for SVG it is raw XML.
+//	@Tags			indigo
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		RenderRequest	true	"Structure and render options"
+//	@Success		200		{object}	RenderResponse
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/v2/indigo/render [post]
 func (s *IndigoService) handleRender(c *gin.Context) {
 	var req RenderRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -456,8 +530,17 @@ func (s *IndigoService) handleRender(c *gin.Context) {
 	})
 }
 
-// handleCheck validates the input structure
-// POST /v2/indigo/check
+// handleCheck godoc
+//
+//	@Summary		Validate structure
+//	@Description	Verify whether the input string is a valid chemical structure (Molfile, SMILES, CML, InChI, etc.)
+//	@Tags			indigo
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		CheckRequest	true	"Structure to validate"
+//	@Success		200		{object}	CheckResponse
+//	@Failure		400		{object}	ErrorResponse
+//	@Router			/v2/indigo/check [post]
 func (s *IndigoService) handleCheck(c *gin.Context) {
 	var req CheckRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -496,8 +579,6 @@ func (s *IndigoService) handleCheck(c *gin.Context) {
 
 // --- Helper functions ---
 
-// convertToOutputFormat converts a molecule to the preferred output format.
-// Defaults to canonical SMILES unless options["output_format"] is specified.
 func convertToOutputFormat(mh *moleculeHandle, options map[string]string) (string, string, error) {
 	format := "smiles"
 	if f, ok := options["output_format"]; ok && f != "" {
@@ -510,7 +591,6 @@ func convertToOutputFormat(mh *moleculeHandle, options map[string]string) (strin
 	return result, format, nil
 }
 
-// convertMolecule converts a molecule to the specified format
 func convertMolecule(mh *moleculeHandle, format string) (string, error) {
 	switch strings.ToLower(format) {
 	case "smiles":

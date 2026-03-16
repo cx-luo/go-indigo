@@ -1,0 +1,705 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "RESTful API service for go-indigo chemistry toolkit. Compatible with EPAM Indigo Service API.\nProvides endpoints for aromatization, dearomatization, format conversion, property calculation, 2D cleanup, structure rendering, and validation.",
+        "title": "Go-Indigo Service API",
+        "contact": {
+            "name": "chengxiang.luo",
+            "email": "chengxiang.luo@foxmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/v2/indigo/aromatize": {
+            "post": {
+                "description": "Aromatize the input chemical structure (molecule or reaction)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "indigo"
+                ],
+                "summary": "Aromatize structure",
+                "parameters": [
+                    {
+                        "description": "Structure to aromatize",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.StructRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.StructResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/indigo/calculate": {
+            "post": {
+                "description": "Calculate properties (molecular weight, formula, TPSA, etc.) for the input structure. If properties array is empty, all properties are computed.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "indigo"
+                ],
+                "summary": "Calculate molecular properties",
+                "parameters": [
+                    {
+                        "description": "Structure and optional property list",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.CalculateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.CalculateResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/indigo/check": {
+            "post": {
+                "description": "Verify whether the input string is a valid chemical structure (Molfile, SMILES, CML, InChI, etc.)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "indigo"
+                ],
+                "summary": "Validate structure",
+                "parameters": [
+                    {
+                        "description": "Structure to validate",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.CheckRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.CheckResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/indigo/clean": {
+            "post": {
+                "description": "Perform 2D layout and coordinate cleanup for the input structure. Returns the result in Molfile format.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "indigo"
+                ],
+                "summary": "Clean up structure coordinates",
+                "parameters": [
+                    {
+                        "description": "Structure to clean",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.StructRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.StructResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/indigo/convert": {
+            "post": {
+                "description": "Convert a chemical structure to a different format (SMILES, Molfile, CML, CDXML, JSON/KET)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "indigo"
+                ],
+                "summary": "Convert structure format",
+                "parameters": [
+                    {
+                        "description": "Structure and target output format",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.ConvertRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.StructResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/indigo/dearomatize": {
+            "post": {
+                "description": "Remove aromaticity from the input chemical structure",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "indigo"
+                ],
+                "summary": "Dearomatize structure",
+                "parameters": [
+                    {
+                        "description": "Structure to dearomatize",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.StructRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.StructResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/indigo/info": {
+            "get": {
+                "description": "Returns the version of the Indigo C library and the go-indigo service",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "indigo"
+                ],
+                "summary": "Get library version info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.InfoResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/indigo/render": {
+            "post": {
+                "description": "Render a chemical structure to PNG, SVG, or PDF. For PNG/PDF the response image field is base64-encoded; for SVG it is raw XML.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "indigo"
+                ],
+                "summary": "Render structure to image",
+                "parameters": [
+                    {
+                        "description": "Structure and render options",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.RenderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.RenderResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/main.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "main.CalculateRequest": {
+            "description": "Request body for calculating molecular properties.",
+            "type": "object",
+            "required": [
+                "struct"
+            ],
+            "properties": {
+                "input_format": {
+                    "description": "Input format hint",
+                    "type": "string",
+                    "example": "auto"
+                },
+                "options": {
+                    "description": "Additional Indigo options",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "properties": {
+                    "description": "Properties to calculate; empty = all",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "molecular-weight",
+                        "gross-formula"
+                    ]
+                },
+                "struct": {
+                    "description": "Chemical structure string",
+                    "type": "string",
+                    "example": "CCO"
+                }
+            }
+        },
+        "main.CalculateResponse": {
+            "description": "Response containing calculated molecular properties. Null fields were not requested or could not be computed.",
+            "type": "object",
+            "properties": {
+                "gross-formula": {
+                    "description": "Gross formula",
+                    "type": "string",
+                    "example": "C2 H6 O"
+                },
+                "mass-composition": {
+                    "description": "Elemental mass composition",
+                    "type": "string"
+                },
+                "molecular-formula": {
+                    "description": "Molecular formula",
+                    "type": "string",
+                    "example": "C2H6O"
+                },
+                "molecular-weight": {
+                    "description": "Molecular weight (g/mol)",
+                    "type": "number",
+                    "example": 46.069
+                },
+                "monoisotopic-mass": {
+                    "description": "Monoisotopic mass",
+                    "type": "number",
+                    "example": 46.042
+                },
+                "most-abundant-mass": {
+                    "description": "Most abundant mass",
+                    "type": "number",
+                    "example": 46.042
+                },
+                "num-atoms": {
+                    "description": "Total atom count",
+                    "type": "integer",
+                    "example": 9
+                },
+                "num-bonds": {
+                    "description": "Total bond count",
+                    "type": "integer",
+                    "example": 8
+                },
+                "num-components": {
+                    "description": "Number of connected components",
+                    "type": "integer",
+                    "example": 1
+                },
+                "num-heavy-atoms": {
+                    "description": "Heavy (non-hydrogen) atom count",
+                    "type": "integer",
+                    "example": 3
+                },
+                "num-rotatable-bonds": {
+                    "description": "Number of rotatable bonds",
+                    "type": "integer",
+                    "example": 0
+                },
+                "num-sssr": {
+                    "description": "Number of smallest set of smallest rings",
+                    "type": "integer",
+                    "example": 0
+                },
+                "tpsa": {
+                    "description": "Topological polar surface area",
+                    "type": "number",
+                    "example": 20.23
+                }
+            }
+        },
+        "main.CheckRequest": {
+            "description": "Request body for validating a chemical structure.",
+            "type": "object",
+            "required": [
+                "struct"
+            ],
+            "properties": {
+                "input_format": {
+                    "description": "Input format hint",
+                    "type": "string",
+                    "example": "auto"
+                },
+                "options": {
+                    "description": "Additional Indigo options",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "struct": {
+                    "description": "Chemical structure string",
+                    "type": "string",
+                    "example": "CCO"
+                },
+                "types": {
+                    "description": "Validation types: valence, ambiguous_h, etc.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "main.CheckResponse": {
+            "description": "Response from structure validation.",
+            "type": "object",
+            "properties": {
+                "errors": {
+                    "description": "Validation error messages",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "format": {
+                    "description": "Format of the canonical representation",
+                    "type": "string",
+                    "example": "smiles"
+                },
+                "struct": {
+                    "description": "Canonical representation of the structure",
+                    "type": "string",
+                    "example": "CCO"
+                },
+                "valid": {
+                    "description": "Whether the structure is valid",
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "main.ConvertRequest": {
+            "description": "Request body for format conversion. Requires struct and output_format.",
+            "type": "object",
+            "required": [
+                "output_format",
+                "struct"
+            ],
+            "properties": {
+                "input_format": {
+                    "description": "Input format hint",
+                    "type": "string",
+                    "example": "auto"
+                },
+                "options": {
+                    "description": "Additional Indigo options",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "output_format": {
+                    "description": "Target format: smiles, molfile, cml, cdxml, json, ket",
+                    "type": "string",
+                    "example": "molfile"
+                },
+                "struct": {
+                    "description": "Chemical structure string",
+                    "type": "string",
+                    "example": "c1ccccc1"
+                }
+            }
+        },
+        "main.ErrorResponse": {
+            "description": "Error response returned when a request fails.",
+            "type": "object",
+            "properties": {
+                "details": {
+                    "description": "Detailed error information",
+                    "type": "string",
+                    "example": ""
+                },
+                "error": {
+                    "description": "Error message",
+                    "type": "string",
+                    "example": "struct field is required"
+                }
+            }
+        },
+        "main.InfoResponse": {
+            "description": "Response containing Indigo library and service version info.",
+            "type": "object",
+            "properties": {
+                "indigo_version": {
+                    "description": "Indigo C library version",
+                    "type": "string",
+                    "example": "1.x"
+                },
+                "service_name": {
+                    "description": "Service name",
+                    "type": "string",
+                    "example": "go-indigo-service"
+                },
+                "service_version": {
+                    "description": "Service version",
+                    "type": "string",
+                    "example": "1.0.0"
+                }
+            }
+        },
+        "main.RenderRequest": {
+            "description": "Request body for rendering a structure to an image.",
+            "type": "object",
+            "required": [
+                "struct"
+            ],
+            "properties": {
+                "height": {
+                    "description": "Image height in pixels",
+                    "type": "integer",
+                    "example": 600
+                },
+                "input_format": {
+                    "description": "Input format hint",
+                    "type": "string",
+                    "example": "auto"
+                },
+                "options": {
+                    "description": "Additional render options (e.g. render-bond-length)",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "output_format": {
+                    "description": "Image format: png, svg, pdf (default: png)",
+                    "type": "string",
+                    "example": "png"
+                },
+                "struct": {
+                    "description": "Chemical structure string",
+                    "type": "string",
+                    "example": "c1ccccc1"
+                },
+                "width": {
+                    "description": "Image width in pixels",
+                    "type": "integer",
+                    "example": 800
+                }
+            }
+        },
+        "main.RenderResponse": {
+            "description": "Response containing the rendered image. For PNG/PDF the image field is base64-encoded; for SVG it is raw XML.",
+            "type": "object",
+            "properties": {
+                "format": {
+                    "description": "Image format: png, svg, pdf",
+                    "type": "string",
+                    "example": "png"
+                },
+                "image": {
+                    "description": "Base64-encoded image data (or raw SVG string)",
+                    "type": "string"
+                }
+            }
+        },
+        "main.StructRequest": {
+            "description": "Common request body containing a chemical structure string and optional parameters.",
+            "type": "object",
+            "required": [
+                "struct"
+            ],
+            "properties": {
+                "input_format": {
+                    "description": "Input format hint: auto, smiles, molfile, cml, inchi",
+                    "type": "string",
+                    "example": "auto"
+                },
+                "options": {
+                    "description": "Additional Indigo options as key-value pairs",
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "struct": {
+                    "description": "Chemical structure string (SMILES, Molfile, CML, etc.)",
+                    "type": "string",
+                    "example": "c1ccccc1"
+                }
+            }
+        },
+        "main.StructResponse": {
+            "description": "Response containing a chemical structure string in the requested format.",
+            "type": "object",
+            "properties": {
+                "format": {
+                    "description": "Output format",
+                    "type": "string",
+                    "example": "smiles"
+                },
+                "original_format": {
+                    "description": "Detected input format",
+                    "type": "string"
+                },
+                "struct": {
+                    "description": "Result structure string",
+                    "type": "string",
+                    "example": "c1ccccc1"
+                }
+            }
+        }
+    },
+    "externalDocs": {
+        "description": "EPAM Indigo Service Documentation",
+        "url": "https://lifescience.opensource.epam.com/indigo/service/index.html"
+    }
+}

@@ -14,7 +14,29 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "github.com/cx-luo/go-indigo/service/docs"
 )
+
+//	@title						Go-Indigo Service API
+//	@version					1.0.0
+//	@description				RESTful API service for go-indigo chemistry toolkit. Compatible with EPAM Indigo Service API.
+//	@description				Provides endpoints for aromatization, dearomatization, format conversion, property calculation, 2D cleanup, structure rendering, and validation.
+//
+//	@contact.name				chengxiang.luo
+//	@contact.email				chengxiang.luo@foxmail.com
+//
+//	@license.name				Apache 2.0
+//	@license.url				http://www.apache.org/licenses/LICENSE-2.0.html
+//
+//	@host						localhost:8080
+//	@BasePath					/
+//	@schemes					http https
+//
+//	@externalDocs.description	EPAM Indigo Service Documentation
+//	@externalDocs.url			https://lifescience.opensource.epam.com/indigo/service/index.html
 
 func main() {
 	port := flag.Int("port", 8080, "server port")
@@ -29,6 +51,7 @@ func main() {
 
 	addr := fmt.Sprintf(":%d", *port)
 	log.Printf("go-indigo service starting on %s (pool=%d, mode=%s)", addr, *poolSize, *mode)
+	log.Printf("Swagger UI: http://localhost:%d/swagger/index.html", *port)
 	if err := r.Run(addr); err != nil {
 		log.Fatalf("failed to start server: %v", err)
 	}
@@ -50,6 +73,8 @@ func setupRouter(svc *IndigoService) *gin.Engine {
 		v2.POST("/render", svc.handleRender)
 		v2.POST("/check", svc.handleCheck)
 	}
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})

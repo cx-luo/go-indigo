@@ -1,0 +1,506 @@
+basePath: /
+definitions:
+  main.CalculateRequest:
+    description: Request body for calculating molecular properties.
+    properties:
+      input_format:
+        description: Input format hint
+        example: auto
+        type: string
+      options:
+        additionalProperties:
+          type: string
+        description: Additional Indigo options
+        type: object
+      properties:
+        description: Properties to calculate; empty = all
+        example:
+        - molecular-weight
+        - gross-formula
+        items:
+          type: string
+        type: array
+      struct:
+        description: Chemical structure string
+        example: CCO
+        type: string
+    required:
+    - struct
+    type: object
+  main.CalculateResponse:
+    description: Response containing calculated molecular properties. Null fields
+      were not requested or could not be computed.
+    properties:
+      gross-formula:
+        description: Gross formula
+        example: C2 H6 O
+        type: string
+      mass-composition:
+        description: Elemental mass composition
+        type: string
+      molecular-formula:
+        description: Molecular formula
+        example: C2H6O
+        type: string
+      molecular-weight:
+        description: Molecular weight (g/mol)
+        example: 46.069
+        type: number
+      monoisotopic-mass:
+        description: Monoisotopic mass
+        example: 46.042
+        type: number
+      most-abundant-mass:
+        description: Most abundant mass
+        example: 46.042
+        type: number
+      num-atoms:
+        description: Total atom count
+        example: 9
+        type: integer
+      num-bonds:
+        description: Total bond count
+        example: 8
+        type: integer
+      num-components:
+        description: Number of connected components
+        example: 1
+        type: integer
+      num-heavy-atoms:
+        description: Heavy (non-hydrogen) atom count
+        example: 3
+        type: integer
+      num-rotatable-bonds:
+        description: Number of rotatable bonds
+        example: 0
+        type: integer
+      num-sssr:
+        description: Number of smallest set of smallest rings
+        example: 0
+        type: integer
+      tpsa:
+        description: Topological polar surface area
+        example: 20.23
+        type: number
+    type: object
+  main.CheckRequest:
+    description: Request body for validating a chemical structure.
+    properties:
+      input_format:
+        description: Input format hint
+        example: auto
+        type: string
+      options:
+        additionalProperties:
+          type: string
+        description: Additional Indigo options
+        type: object
+      struct:
+        description: Chemical structure string
+        example: CCO
+        type: string
+      types:
+        description: 'Validation types: valence, ambiguous_h, etc.'
+        items:
+          type: string
+        type: array
+    required:
+    - struct
+    type: object
+  main.CheckResponse:
+    description: Response from structure validation.
+    properties:
+      errors:
+        description: Validation error messages
+        items:
+          type: string
+        type: array
+      format:
+        description: Format of the canonical representation
+        example: smiles
+        type: string
+      struct:
+        description: Canonical representation of the structure
+        example: CCO
+        type: string
+      valid:
+        description: Whether the structure is valid
+        example: true
+        type: boolean
+    type: object
+  main.ConvertRequest:
+    description: Request body for format conversion. Requires struct and output_format.
+    properties:
+      input_format:
+        description: Input format hint
+        example: auto
+        type: string
+      options:
+        additionalProperties:
+          type: string
+        description: Additional Indigo options
+        type: object
+      output_format:
+        description: 'Target format: smiles, molfile, cml, cdxml, json, ket'
+        example: molfile
+        type: string
+      struct:
+        description: Chemical structure string
+        example: c1ccccc1
+        type: string
+    required:
+    - output_format
+    - struct
+    type: object
+  main.ErrorResponse:
+    description: Error response returned when a request fails.
+    properties:
+      details:
+        description: Detailed error information
+        example: ""
+        type: string
+      error:
+        description: Error message
+        example: struct field is required
+        type: string
+    type: object
+  main.InfoResponse:
+    description: Response containing Indigo library and service version info.
+    properties:
+      indigo_version:
+        description: Indigo C library version
+        example: 1.x
+        type: string
+      service_name:
+        description: Service name
+        example: go-indigo-service
+        type: string
+      service_version:
+        description: Service version
+        example: 1.0.0
+        type: string
+    type: object
+  main.RenderRequest:
+    description: Request body for rendering a structure to an image.
+    properties:
+      height:
+        description: Image height in pixels
+        example: 600
+        type: integer
+      input_format:
+        description: Input format hint
+        example: auto
+        type: string
+      options:
+        additionalProperties:
+          type: string
+        description: Additional render options (e.g. render-bond-length)
+        type: object
+      output_format:
+        description: 'Image format: png, svg, pdf (default: png)'
+        example: png
+        type: string
+      struct:
+        description: Chemical structure string
+        example: c1ccccc1
+        type: string
+      width:
+        description: Image width in pixels
+        example: 800
+        type: integer
+    required:
+    - struct
+    type: object
+  main.RenderResponse:
+    description: Response containing the rendered image. For PNG/PDF the image field
+      is base64-encoded; for SVG it is raw XML.
+    properties:
+      format:
+        description: 'Image format: png, svg, pdf'
+        example: png
+        type: string
+      image:
+        description: Base64-encoded image data (or raw SVG string)
+        type: string
+    type: object
+  main.StructRequest:
+    description: Common request body containing a chemical structure string and optional
+      parameters.
+    properties:
+      input_format:
+        description: 'Input format hint: auto, smiles, molfile, cml, inchi'
+        example: auto
+        type: string
+      options:
+        additionalProperties:
+          type: string
+        description: Additional Indigo options as key-value pairs
+        type: object
+      struct:
+        description: Chemical structure string (SMILES, Molfile, CML, etc.)
+        example: c1ccccc1
+        type: string
+    required:
+    - struct
+    type: object
+  main.StructResponse:
+    description: Response containing a chemical structure string in the requested
+      format.
+    properties:
+      format:
+        description: Output format
+        example: smiles
+        type: string
+      original_format:
+        description: Detected input format
+        type: string
+      struct:
+        description: Result structure string
+        example: c1ccccc1
+        type: string
+    type: object
+externalDocs:
+  description: EPAM Indigo Service Documentation
+  url: https://lifescience.opensource.epam.com/indigo/service/index.html
+host: localhost:8080
+info:
+  contact:
+    email: chengxiang.luo@foxmail.com
+    name: chengxiang.luo
+  description: |-
+    RESTful API service for go-indigo chemistry toolkit. Compatible with EPAM Indigo Service API.
+    Provides endpoints for aromatization, dearomatization, format conversion, property calculation, 2D cleanup, structure rendering, and validation.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Go-Indigo Service API
+  version: 1.0.0
+paths:
+  /v2/indigo/aromatize:
+    post:
+      consumes:
+      - application/json
+      description: Aromatize the input chemical structure (molecule or reaction)
+      parameters:
+      - description: Structure to aromatize
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.StructRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.StructResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Aromatize structure
+      tags:
+      - indigo
+  /v2/indigo/calculate:
+    post:
+      consumes:
+      - application/json
+      description: Calculate properties (molecular weight, formula, TPSA, etc.) for
+        the input structure. If properties array is empty, all properties are computed.
+      parameters:
+      - description: Structure and optional property list
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.CalculateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.CalculateResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Calculate molecular properties
+      tags:
+      - indigo
+  /v2/indigo/check:
+    post:
+      consumes:
+      - application/json
+      description: Verify whether the input string is a valid chemical structure (Molfile,
+        SMILES, CML, InChI, etc.)
+      parameters:
+      - description: Structure to validate
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.CheckRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.CheckResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Validate structure
+      tags:
+      - indigo
+  /v2/indigo/clean:
+    post:
+      consumes:
+      - application/json
+      description: Perform 2D layout and coordinate cleanup for the input structure.
+        Returns the result in Molfile format.
+      parameters:
+      - description: Structure to clean
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.StructRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.StructResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Clean up structure coordinates
+      tags:
+      - indigo
+  /v2/indigo/convert:
+    post:
+      consumes:
+      - application/json
+      description: Convert a chemical structure to a different format (SMILES, Molfile,
+        CML, CDXML, JSON/KET)
+      parameters:
+      - description: Structure and target output format
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.ConvertRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.StructResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Convert structure format
+      tags:
+      - indigo
+  /v2/indigo/dearomatize:
+    post:
+      consumes:
+      - application/json
+      description: Remove aromaticity from the input chemical structure
+      parameters:
+      - description: Structure to dearomatize
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.StructRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.StructResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Dearomatize structure
+      tags:
+      - indigo
+  /v2/indigo/info:
+    get:
+      description: Returns the version of the Indigo C library and the go-indigo service
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.InfoResponse'
+      summary: Get library version info
+      tags:
+      - indigo
+  /v2/indigo/render:
+    post:
+      consumes:
+      - application/json
+      description: Render a chemical structure to PNG, SVG, or PDF. For PNG/PDF the
+        response image field is base64-encoded; for SVG it is raw XML.
+      parameters:
+      - description: Structure and render options
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.RenderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.RenderResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Render structure to image
+      tags:
+      - indigo
+schemes:
+- http
+- https
+swagger: "2.0"
