@@ -531,13 +531,13 @@ func TestRenderMultipleFormats(t *testing.T) {
 
 func TestRenderToFile(t *testing.T) {
 	// Load a molecule
-	mol, err := indigoInit.LoadMoleculeFromFile("../test_data/markush.mol")
+	mol, err := indigoInit.LoadMoleculeFromFile("../data/multiple-group-structure.mol")
 	if err != nil {
 		t.Fatalf("failed to load molecule: %v", err)
 	}
 	defer mol.Close()
 
-	outputFile := filepath.Join("../test_data/", "markush.svg")
+	outputFile := filepath.Join("../data/", "markush.svg")
 
 	indigoRender, err := indigoInit.InitRenderer()
 	if err != nil {
